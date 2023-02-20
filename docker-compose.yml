@@ -1,0 +1,53 @@
+version: "3.5"
+services:
+  es01:
+    restart: always
+    image: docker.elastic.co/elasticsearch/elasticsearch:$VERSION
+    container_name: es01
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms10g -Xmx10g"
+      - node.name=es01
+      - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+      - xpack.security.transport.ssl.certificate=$CERTS_DIR/es01/es01.crt
+      - xpack.security.transport.ssl.key=$CERTS_DIR/es01/es01.key
+      - "discovery.type=single-node"
+      - TZ=Asia/Taipei
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./data01/:/usr/share/elasticsearch/data
+      - ./certificates/certs:$CERTS_DIR
+      - ./elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:
+      - 52200:9200
+      - 52300:9300
+    networks:
+      - elastic
+    healthcheck:
+      test:
+        curl -s -u elastic:$ELASTIC_PASSWORD http://localhost:9200 >/dev/null; if
+        [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  kib01:
+    restart: always
+    image: docker.elastic.co/kibana/kibana:$VERSION
+    container_name: kib01
+    depends_on: { "es01": { "condition": "service_healthy" } }
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTICSEARCH_URL=http://es01:9200
+      - ELASTICSEARCH_HOSTS=http://es01:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=$ELASTIC_PASSWORD
+      - TZ=Asia/Taipei
+    networks:
+      - elastic
+
+networks:
+  elastic:

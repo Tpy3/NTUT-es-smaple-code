@@ -1,0 +1,43 @@
+{
+    "settings": {
+        "index": {
+            "number_of_shards": "2",
+            "number_of_replicas": "0"
+        }
+    },
+    "mappings": {
+        "properties": {
+            "title": {
+                "type": "keyword",
+                "null_value": "null"
+            },
+            "content": {
+                "type": "text"
+            },
+            "page_url": {
+                "type": "keyword",
+                "null_value": "null"
+            },
+            "s_area_name": {
+                "type": "keyword",
+                "null_value": "null"
+            },
+            "s_name": {
+                "type": "keyword",
+                "null_value": "null"
+            },
+            "main_label": {
+                "type": "keyword",
+                "null_value": "null"
+            },
+            "label": {
+                "type": "keyword",
+                "null_value": "null"
+            },
+            "post_time": {
+                "type": "date",
+                "format": "yyyy-MM-dd HH:mm:ss"
+            }
+        }
+    }
+}
